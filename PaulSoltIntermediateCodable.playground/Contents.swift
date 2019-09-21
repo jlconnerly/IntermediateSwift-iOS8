@@ -5,13 +5,35 @@ import UIKit
 
 struct Person: Codable {
     let name: String
-    let height: String
+    let height: Int
     let hairColor: String
     
-    enum CodingKeys: String, CodingKey {
+    //can name CodingKeys something else if you've overriden init()
+//    enum CodingKeys: String, CodingKey{
+    enum PersonKeys: String, CodingKey {
         case name
         case height
         case hairColor = "hair_color"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: PersonKeys.self)
+        
+        //setting coding keys manually
+        name = try container.decode(String.self, forKey: .name)
+        
+        /*
+        This is cool because in the API height is a string in the JSON but writing
+        our own init, we can parse the JSON properly and also keep our height in
+        the struct as an Int
+         */
+        let heightString = try container.decode(String.self, forKey: .height)
+        height = Int(heightString) ?? 0
+        /*
+         so NOW we can keep our height the proper type that we want to use even though
+         it is NOT they type we want in JSON
+        */
+        hairColor = try container.decode(String.self, forKey: .hairColor)
     }
 }
 
